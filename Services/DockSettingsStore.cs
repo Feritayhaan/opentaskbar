@@ -81,9 +81,18 @@ public sealed class DockSettingsStore
     private static bool IsValid(DockSettings settings) => Enum.IsDefined(settings.Position)
         && Enum.IsDefined(settings.Theme) && Enum.IsDefined(settings.Language)
         && Enum.IsDefined(settings.AutoHide)
+        && Enum.IsDefined(settings.Edge) && Enum.IsDefined(settings.Layout) && Enum.IsDefined(settings.Style)
+        && QuietHours.TryParseTime(settings.QuietHoursStart, out _) && QuietHours.TryParseTime(settings.QuietHoursEnd, out _)
+        && (settings.CalendarUrls?.Count ?? 0) <= 6 && settings.CalendarUrls?.Any(string.IsNullOrWhiteSpace) != true
+        && (settings.WorldClocks?.Count ?? 0) <= 6
         && double.IsFinite(settings.SurfaceOpacity) && settings.SurfaceOpacity is >= 0.6 and <= 1
         && settings.PinOrder?.Any(string.IsNullOrWhiteSpace) != true
-        && settings.PinOrder?.Distinct(StringComparer.OrdinalIgnoreCase).Count() == settings.PinOrder?.Count;
+        && settings.PinOrder?.Distinct(StringComparer.OrdinalIgnoreCase).Count() == settings.PinOrder?.Count
+        && (settings.WeatherCity?.Length ?? 0) <= 120
+        && settings.MarketSymbols?.Any(string.IsNullOrWhiteSpace) != true
+        && (settings.MarketSymbols?.Count ?? 0) <= 8
+        && settings.BarWidgets?.Any(string.IsNullOrWhiteSpace) != true
+        && (settings.BarWidgets?.Count ?? 0) <= 16;
 
     private static JsonSerializerOptions CreateJsonOptions()
     {

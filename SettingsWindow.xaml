@@ -105,6 +105,34 @@
                                     <RadioButton x:Name="RightPosition" GroupName="Position" Content="{local:Loc Right}" Style="{StaticResource SettingsChoice}" />
                                 </UniformGrid>
                             </StackPanel></Border>
+                            <Border Style="{StaticResource SettingsChoiceRow}"><StackPanel>
+                                <TextBlock Text="{local:Loc Placement}" Style="{StaticResource SettingsChoiceLabel}" />
+                                <UniformGrid Columns="2" Margin="-3,0">
+                                    <RadioButton x:Name="EdgeBottomRadio" GroupName="Edge" Content="{local:Loc EdgeBottom}" Style="{StaticResource SettingsChoice}" />
+                                    <RadioButton x:Name="EdgeTopRadio" GroupName="Edge" Content="{local:Loc EdgeTop}" Style="{StaticResource SettingsChoice}" />
+                                </UniformGrid>
+                                <TextBlock Text="{local:Loc PlacementHelp}" FontSize="{StaticResource TextSizeCaption}"
+                                           Foreground="{DynamicResource TextSecondary}" Margin="0,6,0,0" TextWrapping="Wrap" />
+                            </StackPanel></Border>
+                            <Border Style="{StaticResource SettingsChoiceRow}"><StackPanel>
+                                <TextBlock Text="{local:Loc LayoutTitle}" Style="{StaticResource SettingsChoiceLabel}" />
+                                <UniformGrid Columns="2" Margin="-3,0">
+                                    <RadioButton x:Name="LayoutPillRadio" GroupName="Layout" Content="{local:Loc LayoutPill}" Style="{StaticResource SettingsChoice}" />
+                                    <RadioButton x:Name="LayoutFullRadio" GroupName="Layout" Content="{local:Loc LayoutFull}" Style="{StaticResource SettingsChoice}" />
+                                </UniformGrid>
+                            </StackPanel></Border>
+                            <Border Style="{StaticResource SettingsChoiceRow}"><StackPanel>
+                                <TextBlock Text="{local:Loc BarStyleTitle}" Style="{StaticResource SettingsChoiceLabel}" />
+                                <UniformGrid Columns="3" Margin="-3,0">
+                                    <RadioButton x:Name="StyleGlassRadio" GroupName="BarStyle" Content="{local:Loc StyleGlass}" Style="{StaticResource SettingsChoice}" />
+                                    <RadioButton x:Name="StyleWhiteRadio" GroupName="BarStyle" Content="{local:Loc StyleWhite}" Style="{StaticResource SettingsChoice}" />
+                                    <RadioButton x:Name="StyleIosRadio" GroupName="BarStyle" Content="{local:Loc StyleIos}" Style="{StaticResource SettingsChoice}" />
+                                    <RadioButton x:Name="StyleMidnightRadio" GroupName="BarStyle" Content="{local:Loc StyleMidnight}" Style="{StaticResource SettingsChoice}" />
+                                    <RadioButton x:Name="StyleBlackRadio" GroupName="BarStyle" Content="{local:Loc StyleBlack}" Style="{StaticResource SettingsChoice}" />
+                                </UniformGrid>
+                                <TextBlock Text="{local:Loc BarStyleHelp}" FontSize="{StaticResource TextSizeCaption}"
+                                           Foreground="{DynamicResource TextSecondary}" Margin="0,6,0,0" TextWrapping="Wrap" />
+                            </StackPanel></Border>
                             <StackPanel Margin="0,16,0,0">
                                 <DockPanel Margin="0,0,0,12">
                                     <TextBlock x:Name="OpacityValue" DockPanel.Dock="Right" Foreground="{DynamicResource TextSecondary}" />
@@ -118,7 +146,113 @@
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>
-                <TabItem Header="{local:Loc Widgets}" IsEnabled="False" ToolTip="{local:Loc WidgetsUnavailable}" ToolTipService.ShowOnDisabled="True" />
+                <TabItem Header="{local:Loc Widgets}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" CanContentScroll="False">
+                        <StackPanel Margin="{StaticResource SettingsPageInset}">
+                            <TextBlock Text="{local:Loc Widgets}" Style="{StaticResource SettingsHeading}" />
+                            <Border Style="{StaticResource SettingsRow}"><DockPanel>
+                                <CheckBox x:Name="SearchHotkeyToggle" DockPanel.Dock="Right" Style="{StaticResource SettingsSwitch}"
+                                          AutomationProperties.Name="{local:Loc SearchHotkey}" />
+                                <TextBlock Text="{local:Loc SearchHotkey}" Style="{StaticResource SettingsRowLabel}" />
+                            </DockPanel></Border>
+                            <Border Style="{StaticResource SettingsChoiceRow}">
+                                <StackPanel>
+                                    <TextBlock Text="{local:Loc WeatherCity}" Style="{StaticResource SettingsChoiceLabel}" />
+                                    <TextBox x:Name="WeatherCityBox" Padding="10,7" FontSize="{StaticResource TextSizeBody}"
+                                             Background="{DynamicResource SettingsControl}" Foreground="{DynamicResource TextPrimary}"
+                                             BorderBrush="{DynamicResource MenuStroke}" BorderThickness="1"
+                                             CaretBrush="{DynamicResource AccentBrush}"
+                                             TextChanged="WidgetField_TextChanged" />
+                                    <TextBlock Text="{local:Loc WeatherCityHelp}" FontSize="{StaticResource TextSizeCaption}"
+                                               Foreground="{DynamicResource TextSecondary}" Margin="0,6,0,0" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource SettingsChoiceRow}">
+                                <StackPanel>
+                                    <TextBlock Text="{local:Loc StockSymbols}" Style="{StaticResource SettingsChoiceLabel}" />
+                                    <TextBox x:Name="MarketSymbolsBox" Padding="10,7" FontSize="{StaticResource TextSizeBody}"
+                                             Background="{DynamicResource SettingsControl}" Foreground="{DynamicResource TextPrimary}"
+                                             BorderBrush="{DynamicResource MenuStroke}" BorderThickness="1"
+                                             CaretBrush="{DynamicResource AccentBrush}"
+                                             TextChanged="WidgetField_TextChanged" />
+                                    <TextBlock Text="{local:Loc StockSymbolsHelp}" FontSize="{StaticResource TextSizeCaption}"
+                                               Foreground="{DynamicResource TextSecondary}" Margin="0,6,0,0" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource SettingsChoiceRow}">
+                                <StackPanel>
+                                    <TextBlock Text="{local:Loc CalendarLinks}" Style="{StaticResource SettingsChoiceLabel}" />
+                                    <TextBox x:Name="CalendarUrlsBox" Padding="10,7" FontSize="{StaticResource TextSizeBody}"
+                                             Background="{DynamicResource SettingsControl}" Foreground="{DynamicResource TextPrimary}"
+                                             BorderBrush="{DynamicResource MenuStroke}" BorderThickness="1"
+                                             CaretBrush="{DynamicResource AccentBrush}"
+                                             TextChanged="WidgetField_TextChanged" />
+                                    <TextBlock Text="{local:Loc CalendarLinksHelp}" FontSize="{StaticResource TextSizeCaption}"
+                                               Foreground="{DynamicResource TextSecondary}" Margin="0,6,0,0" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource SettingsChoiceRow}">
+                                <StackPanel>
+                                    <TextBlock Text="{local:Loc WorldClocks}" Style="{StaticResource SettingsChoiceLabel}" />
+                                    <TextBox x:Name="WorldClocksBox" Padding="10,7" FontSize="{StaticResource TextSizeBody}"
+                                             Background="{DynamicResource SettingsControl}" Foreground="{DynamicResource TextPrimary}"
+                                             BorderBrush="{DynamicResource MenuStroke}" BorderThickness="1"
+                                             CaretBrush="{DynamicResource AccentBrush}"
+                                             TextChanged="WidgetField_TextChanged" />
+                                    <TextBlock Text="{local:Loc WorldClocksHelp}" FontSize="{StaticResource TextSizeCaption}"
+                                               Foreground="{DynamicResource TextSecondary}" Margin="0,6,0,0" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Header="{local:Loc Automations}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" CanContentScroll="False">
+                        <StackPanel Margin="{StaticResource SettingsPageInset}">
+                            <TextBlock Text="{local:Loc Automations}" Style="{StaticResource SettingsHeading}" />
+                            <Border Style="{StaticResource SettingsRow}"><DockPanel>
+                                <CheckBox x:Name="AutoMeetingToggle" DockPanel.Dock="Right" Style="{StaticResource SettingsSwitch}"
+                                          AutomationProperties.Name="{local:Loc AutoMeetingMedia}" />
+                                <TextBlock Text="{local:Loc AutoMeetingMedia}" Style="{StaticResource SettingsRowLabel}" />
+                            </DockPanel></Border>
+                            <Border Style="{StaticResource SettingsRow}"><DockPanel>
+                                <CheckBox x:Name="AutoAiToggle" DockPanel.Dock="Right" Style="{StaticResource SettingsSwitch}"
+                                          AutomationProperties.Name="{local:Loc AutoAiLimitAlert}" />
+                                <TextBlock Text="{local:Loc AutoAiLimitAlert}" Style="{StaticResource SettingsRowLabel}" />
+                            </DockPanel></Border>
+                            <Border Style="{StaticResource SettingsRow}"><DockPanel>
+                                <CheckBox x:Name="AutoBatteryToggle" DockPanel.Dock="Right" Style="{StaticResource SettingsSwitch}"
+                                          AutomationProperties.Name="{local:Loc AutoLowBatteryAlert}" />
+                                <TextBlock Text="{local:Loc AutoLowBatteryAlert}" Style="{StaticResource SettingsRowLabel}" />
+                            </DockPanel></Border>
+
+                            <TextBlock Text="{local:Loc QuietHours}" FontWeight="SemiBold" Margin="0,22,0,6" />
+                            <Border Style="{StaticResource SettingsRow}"><DockPanel>
+                                <CheckBox x:Name="QuietHoursToggle" DockPanel.Dock="Right" Style="{StaticResource SettingsSwitch}"
+                                          AutomationProperties.Name="{local:Loc QuietHours}" AutomationProperties.HelpText="{local:Loc QuietHoursDescription}" />
+                                <TextBlock Text="{local:Loc QuietHoursDescription}" Style="{StaticResource SettingsRowLabel}" TextWrapping="Wrap" />
+                            </DockPanel></Border>
+                            <Border Style="{StaticResource SettingsChoiceRow}">
+                                <UniformGrid Columns="2">
+                                    <StackPanel Margin="0,0,8,0">
+                                        <TextBlock Text="{local:Loc QuietFrom}" Style="{StaticResource SettingsChoiceLabel}" />
+                                        <TextBox x:Name="QuietStartBox" Padding="10,7" FontSize="{StaticResource TextSizeBody}"
+                                                 Background="{DynamicResource SettingsControl}" Foreground="{DynamicResource TextPrimary}"
+                                                 BorderBrush="{DynamicResource MenuStroke}" BorderThickness="1" MaxLength="5"
+                                                 CaretBrush="{DynamicResource AccentBrush}" TextChanged="WidgetField_TextChanged" />
+                                    </StackPanel>
+                                    <StackPanel Margin="8,0,0,0">
+                                        <TextBlock Text="{local:Loc QuietTo}" Style="{StaticResource SettingsChoiceLabel}" />
+                                        <TextBox x:Name="QuietEndBox" Padding="10,7" FontSize="{StaticResource TextSizeBody}"
+                                                 Background="{DynamicResource SettingsControl}" Foreground="{DynamicResource TextPrimary}"
+                                                 BorderBrush="{DynamicResource MenuStroke}" BorderThickness="1" MaxLength="5"
+                                                 CaretBrush="{DynamicResource AccentBrush}" TextChanged="WidgetField_TextChanged" />
+                                    </StackPanel>
+                                </UniformGrid>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
             </TabControl>
             <Border Grid.Row="2" Padding="20,12" BorderBrush="{DynamicResource MenuDivider}" BorderThickness="0,1,0,0">
                 <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>

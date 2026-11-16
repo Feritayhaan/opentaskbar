@@ -16,7 +16,7 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         UiText.Current.SetLanguage(Preferences.Current.Language);
-        ThemeManager.Apply(Preferences.Current.Theme, Preferences.Current.SurfaceOpacity);
+        ThemeManager.Apply(Preferences.Current);
         _instanceMutex = new Mutex(initiallyOwned: true, name: "Local\\OpenTaskbar.Singleton", out var createdNew);
         if (!createdNew)
         {

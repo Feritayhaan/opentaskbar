@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:OpenTaskbar.Services"
         Title="OpenTaskbar"
-        Width="360"
+        Width="1280"
         Height="{StaticResource DockWindowHeight}"
         MinHeight="0"
         FontFamily="{StaticResource InterfaceFont}"
@@ -30,6 +30,20 @@
             <MenuItem Header="{local:Loc Terminate}" Icon="{StaticResource IconTerminate}" Style="{StaticResource DestructiveMenuItem}" Tag="TerminateDockApp" Click="TerminateDockApp_Click" />
         </ContextMenu>
         <ContextMenu x:Key="DockContextMenu" x:Shared="False" Opened="DockContextMenu_Opened" Closed="DockContextMenu_Closed">
+            <MenuItem Header="{local:Loc OpenWidgets}" Icon="{StaticResource IconWidgets}" Click="WidgetsButton_Click" />
+            <MenuItem Header="{local:Loc BarWidgetsTitle}" Icon="{StaticResource IconPlus}" SubmenuOpened="BarWidgetsMenu_SubmenuOpened">
+                <MenuItem Header="{local:Loc WidgetSearch}" Tag="search" IsCheckable="True" Click="ToggleBarWidgetMenu_Click" />
+                <MenuItem Header="{local:Loc WidgetWeather}" Tag="weather" IsCheckable="True" Click="ToggleBarWidgetMenu_Click" />
+                <MenuItem Header="{local:Loc WidgetClaude}" Tag="claude" IsCheckable="True" Click="ToggleBarWidgetMenu_Click" />
+                <MenuItem Header="{local:Loc WidgetHardware}" Tag="hardware" IsCheckable="True" Click="ToggleBarWidgetMenu_Click" />
+                <MenuItem Header="{local:Loc WidgetPomodoro}" Tag="pomodoro" IsCheckable="True" Click="ToggleBarWidgetMenu_Click" />
+                <MenuItem Header="{local:Loc WidgetMedia}" Tag="media" IsCheckable="True" Click="ToggleBarWidgetMenu_Click" />
+                <MenuItem Header="{local:Loc WidgetMarkets}" Tag="markets" IsCheckable="True" Click="ToggleBarWidgetMenu_Click" />
+                <MenuItem Header="{local:Loc WidgetStatus}" Tag="status" IsCheckable="True" Click="ToggleBarWidgetMenu_Click" />
+                <MenuItem Header="{local:Loc WidgetCalendar}" Tag="calendar" IsCheckable="True" Click="ToggleBarWidgetMenu_Click" />
+                <MenuItem Header="{local:Loc WidgetWorldClock}" Tag="worldclock" IsCheckable="True" Click="ToggleBarWidgetMenu_Click" />
+            </MenuItem>
+            <MenuItem Header="{local:Loc MoveBarEdge}" Icon="{StaticResource IconChevronRight}" Click="MoveEdgeMenu_Click" />
             <MenuItem Header="{local:Loc Settings}" Icon="{StaticResource IconSettings}" Click="OpenSettings_Click" />
             <Separator />
             <MenuItem Header="{local:Loc Exit}" Icon="{StaticResource IconExit}" Click="ExitOpenTaskbar_Click" />
@@ -40,8 +54,8 @@
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Width" Value="{DynamicResource DockCellSize}" />
-            <Setter Property="Height" Value="{DynamicResource DockCellHeight}" />
-            <Setter Property="Margin" Value="0" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Margin" Value="1,0" />
             <Setter Property="Padding" Value="0" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="RenderTransformOrigin" Value="0.5,0.95" />
@@ -50,21 +64,21 @@
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="Surface" Background="{TemplateBinding Background}"
                                 BorderBrush="Transparent" BorderThickness="0"
-                                CornerRadius="{StaticResource ControlRadius}" Padding="{TemplateBinding Padding}">
-                            <Grid>
+                                CornerRadius="9" Padding="{TemplateBinding Padding}">
+                            <Grid Height="40">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="34" />
                                     <RowDefinition Height="6" />
                                 </Grid.RowDefinitions>
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                <Ellipse x:Name="ActiveIndicator" Grid.Row="1" Height="4" Width="4"
-                                         Fill="{DynamicResource IndicatorBrush}" VerticalAlignment="Center"
-                                         HorizontalAlignment="Center" Visibility="Collapsed" />
+                                <ContentPresenter Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <Border x:Name="ActiveIndicator" Grid.Row="1" Height="3.5" Width="4" CornerRadius="1.75"
+                                        Background="{DynamicResource IndicatorBrush}" VerticalAlignment="Center"
+                                        HorizontalAlignment="Center" Visibility="Collapsed" />
                             </Grid>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Surface" Property="Background" Value="Transparent" />
+                                <Setter TargetName="Surface" Property="Background" Value="{DynamicResource SurfaceHover}" />
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="Surface" Property="Background" Value="{DynamicResource SurfacePressed}" />
@@ -77,15 +91,107 @@
                             </Trigger>
                             <DataTrigger Binding="{Binding IsRunning}" Value="True">
                                 <Setter TargetName="ActiveIndicator" Property="Visibility" Value="Visible" />
-                                <Setter TargetName="ActiveIndicator" Property="Opacity" Value="0.55" />
+                                <Setter TargetName="ActiveIndicator" Property="Opacity" Value="0.7" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding IsForeground}" Value="True">
                                 <Setter TargetName="ActiveIndicator" Property="Visibility" Value="Visible" />
                                 <Setter TargetName="ActiveIndicator" Property="Opacity" Value="1.0" />
-                                <Setter TargetName="ActiveIndicator" Property="Width" Value="5" />
-                                <Setter TargetName="ActiveIndicator" Property="Height" Value="5" />
-                                <Setter TargetName="ActiveIndicator" Property="Fill" Value="{DynamicResource IndicatorForegroundBrush}" />
+                                <Setter TargetName="ActiveIndicator" Property="Width" Value="16" />
+                                <Setter TargetName="ActiveIndicator" Property="Height" Value="3.5" />
+                                <Setter TargetName="ActiveIndicator" Property="CornerRadius" Value="1.75" />
+                                <Setter TargetName="ActiveIndicator" Property="Background" Value="{DynamicResource IndicatorForegroundBrush}" />
                             </DataTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DockCapsuleButton" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource WidgetCardSurface}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource WidgetCardBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Padding" Value="9,0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Surface" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Surface" Property="Background" Value="{DynamicResource SurfaceHover}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Surface" Property="Background" Value="{DynamicResource SurfacePressed}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DockUtilityButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="MinWidth" Value="30" />
+            <Setter Property="Padding" Value="5,3" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Surface" Background="{TemplateBinding Background}"
+                                CornerRadius="10" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Surface" Property="Background" Value="{DynamicResource SurfaceHover}" />
+                                <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Surface" Property="Background" Value="{DynamicResource SurfacePressed}" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Surface" Property="Background" Value="{DynamicResource SurfaceKeyboardFocus}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DockMiniIconButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Width" Value="24" />
+            <Setter Property="Height" Value="24" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Surface" Background="{TemplateBinding Background}" CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Surface" Property="Background" Value="{DynamicResource SurfaceHover}" />
+                                <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Surface" Property="Background" Value="{DynamicResource SurfacePressed}" />
+                            </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
@@ -132,15 +238,35 @@
                     Drop="DockApp_Drop"
                     DragOver="DockApp_DragOver"
                     MouseEnter="DockApp_MouseEnter" MouseLeave="DockApp_MouseLeave">
-                <Grid Width="{DynamicResource DockIconSize}" Height="{DynamicResource DockIconSize}"
-                      RenderTransformOrigin="0.5,0.95">
+                <Grid Width="30" Height="30" RenderTransformOrigin="0.5,0.95">
                     <Grid.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform ScaleX="1" ScaleY="1" />
                             <TranslateTransform Y="0" />
                         </TransformGroup>
                     </Grid.RenderTransform>
-                    <Image Source="{Binding Icon}" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality" />
+                    <Border Width="30" Height="30" CornerRadius="7" RenderOptions.BitmapScalingMode="HighQuality">
+                        <Border.Background>
+                            <ImageBrush ImageSource="{Binding Icon}" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality" />
+                        </Border.Background>
+                    </Border>
+                    <Border Width="30" Height="30" CornerRadius="7" Background="{DynamicResource SurfaceHover}"
+                            BorderBrush="{DynamicResource StrokeSubtle}" BorderThickness="1">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Icon}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <Path Data="{StaticResource IconAppFallback}" Width="17" Height="17" Stretch="Uniform"
+                              Stroke="{DynamicResource TextSecondary}" StrokeThickness="1.6"
+                              StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                              HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
                     <Ellipse Width="9" Height="9" Fill="{DynamicResource NotificationBrush}"
                              Stroke="{DynamicResource SurfacePopup}" StrokeThickness="1"
                              HorizontalAlignment="Right" VerticalAlignment="Top"
@@ -152,64 +278,300 @@
 
     <Grid x:Name="DockHost">
         <Grid.RowDefinitions>
-            <RowDefinition Height="{Binding Source={StaticResource DockHeadroom}}" />
-            <RowDefinition Height="*" />
+            <RowDefinition x:Name="DockRowA" Height="{Binding Source={StaticResource DockHeadroom}}" />
+            <RowDefinition x:Name="DockRowB" Height="*" />
         </Grid.RowDefinitions>
-        <Border Grid.Row="1" Background="#01000000" ContextMenu="{StaticResource DockContextMenu}" />
-        <Border x:Name="DockSurface" Grid.Row="1" HorizontalAlignment="Stretch" Padding="{StaticResource DockPadding}"
-                Margin="{StaticResource DockInset}" VerticalAlignment="Bottom"
+        <Border x:Name="DockHitArea" Grid.Row="1" Background="#01000000" ContextMenu="{StaticResource DockContextMenu}" />
+        <Border x:Name="DockSurface" Grid.Row="1" HorizontalAlignment="Center" Height="46"
+                Padding="10,2" Margin="10,0,10,2" VerticalAlignment="Bottom"
                 Background="{DynamicResource DockMaterial}" BorderBrush="{DynamicResource DockBorderMaterial}" BorderThickness="1"
-                CornerRadius="{StaticResource DockRadius}" ContextMenu="{StaticResource DockContextMenu}"
+                CornerRadius="15" ContextMenu="{StaticResource DockContextMenu}"
                 MouseEnter="DockSurface_MouseEnter" MouseMove="DockSurface_MouseMove" MouseLeave="DockSurface_MouseLeave">
             <Border.RenderTransform>
                 <TranslateTransform x:Name="DockSurfaceTranslate" Y="0" />
             </Border.RenderTransform>
             <Border.Effect>
-                <DropShadowEffect Color="#000000" BlurRadius="20" ShadowDepth="3" Direction="270" Opacity="0.38" RenderingBias="Performance" />
+                <DropShadowEffect Color="#000000" BlurRadius="22" ShadowDepth="4" Direction="270" Opacity="0.42" RenderingBias="Performance" />
             </Border.Effect>
-        <StackPanel x:Name="DockContents" Orientation="Horizontal" HorizontalAlignment="Left"
-                    VerticalAlignment="Center">
-            <Button x:Name="StartButton" Style="{StaticResource DockButton}" Click="StartButton_Click"
-                    AutomationProperties.Name="{local:Loc Start}" ToolTip="{local:Loc Start}" ToolTipService.InitialShowDelay="650">
-                <Grid Width="{DynamicResource DockIconSize}" Height="{DynamicResource DockIconSize}"
-                      RenderTransformOrigin="0.5,0.95">
-                    <Grid.RenderTransform>
-                        <TransformGroup>
-                            <ScaleTransform ScaleX="1" ScaleY="1" />
-                            <TranslateTransform Y="0" />
-                        </TransformGroup>
-                    </Grid.RenderTransform>
-                    <Path Width="24" Height="24" Stretch="Uniform" Fill="{DynamicResource WindowsLogoBrush}"
-                          Data="M0,0 H10 V10 H0 Z M12,0 H22 V10 H12 Z M0,12 H10 V22 H0 Z M12,12 H22 V22 H12 Z" />
-                </Grid>
-            </Button>
-            <Border Width="1" Height="22" Background="{DynamicResource StrokeSubtle}" Margin="3,0,4,0" />
-            <ItemsControl x:Name="PinnedApps" ItemTemplate="{StaticResource DockAppIconTemplate}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-            <Border x:Name="RunningAppsDivider" Width="1" Height="22" Background="{DynamicResource StrokeSubtle}" Margin="4,0,4,0" Visibility="Collapsed" />
-            <ItemsControl x:Name="RunningApps" ItemTemplate="{StaticResource DockAppIconTemplate}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-            <TextBlock x:Name="StatusText" Foreground="{DynamicResource DangerText}" FontSize="{StaticResource TextSizeCaption}"
-                       MaxWidth="280" VerticalAlignment="Center" Margin="8,0" TextWrapping="Wrap">
-                <TextBlock.Style>
-                    <Style TargetType="TextBlock">
-                        <Style.Triggers>
-                            <Trigger Property="Text" Value="">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style>
-            </TextBlock>
-        </StackPanel>
-    </Border>
-    <Border x:Name="DockEdgeTrigger" Grid.Row="1" VerticalAlignment="Bottom" Height="3" Background="#01000000"
-            MouseEnter="DockEdgeTrigger_MouseEnter" MouseLeave="DockEdgeTrigger_MouseLeave" />
+
+            <Grid x:Name="DockContents" VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition x:Name="DockCenterColumn" Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <!-- LEFT ZONE: Start + Optional Left Capsules -->
+                <StackPanel x:Name="LeftZonePanel" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="StartButton" Style="{StaticResource DockCapsuleButton}" Click="StartButton_Click"
+                            Width="38" Padding="0"
+                            AutomationProperties.Name="{local:Loc Start}" ToolTip="{local:Loc Start}" ToolTipService.InitialShowDelay="500">
+                        <Grid Width="20" Height="20" RenderTransformOrigin="0.5,0.5">
+                            <Grid.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform ScaleX="1" ScaleY="1" />
+                                    <TranslateTransform Y="0" />
+                                </TransformGroup>
+                            </Grid.RenderTransform>
+                            <Path Width="18" Height="18" Stretch="Uniform" Fill="{DynamicResource WindowsLogoBrush}"
+                                  Data="M0,0 H10 V10 H0 Z M12,0 H22 V10 H12 Z M0,12 H10 V22 H0 Z M12,12 H22 V22 H12 Z" />
+                        </Grid>
+                    </Button>
+
+                    <!-- Spotlight Search Capsule -->
+                    <Button x:Name="SearchPillButton" Style="{StaticResource DockCapsuleButton}" Click="SearchPillButton_Click"
+                            Margin="6,0,0,0" Padding="10,0"
+                            AutomationProperties.Name="{local:Loc SearchPlaceholder}" ToolTipService.InitialShowDelay="450">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Path Data="{StaticResource IconSearch}" Width="13.5" Height="13.5" Stretch="Uniform"
+                                  Stroke="{DynamicResource AccentBrush}" StrokeThickness="1.9"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                                  VerticalAlignment="Center" />
+                            <TextBlock Text="{local:Loc SearchPlaceholder}" FontSize="11.5" FontWeight="Medium"
+                                       Foreground="{DynamicResource TextPrimary}" Margin="7,0,7,0" VerticalAlignment="Center" />
+                            <Border Background="{DynamicResource SurfaceSelected}" BorderBrush="{DynamicResource StrokeSubtle}"
+                                    BorderThickness="1" CornerRadius="5" Padding="5,1" VerticalAlignment="Center">
+                                <TextBlock Text="Alt+Space" FontSize="9.5" Foreground="{DynamicResource TextSecondary}" />
+                            </Border>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Live Weather Capsule -->
+                    <Button x:Name="WeatherMiniButton" Style="{StaticResource DockCapsuleButton}" Click="WidgetsButton_Click"
+                            Margin="6,0,0,0" Padding="10,0" ToolTip="{local:Loc Weather}" ToolTipService.InitialShowDelay="450">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Path x:Name="DockWeatherGlyph" Data="{StaticResource IconCloudSun}" Width="15" Height="15" Stretch="Uniform"
+                                  Stroke="{DynamicResource AccentBrush}" StrokeThickness="1.8"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" VerticalAlignment="Center" />
+                            <TextBlock x:Name="DockWeatherTempText" Text="--°" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimary}" Margin="6,0,0,0" VerticalAlignment="Center" />
+                            <TextBlock x:Name="DockWeatherCityText" FontSize="11" Foreground="{DynamicResource TextSecondary}"
+                                       Margin="5,0,0,0" MaxWidth="78" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Live Hardware Telemetry Capsule (CPU & RAM) -->
+                    <Button x:Name="HardwareMiniButton" Style="{StaticResource DockCapsuleButton}" Click="WidgetsButton_Click"
+                            Margin="6,0,0,0" Padding="10,0" ToolTip="{local:Loc SystemMonitor}" ToolTipService.InitialShowDelay="450">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="CPU" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
+                            <ProgressBar x:Name="DockCpuBar" Width="22" Height="4" Minimum="0" Maximum="100" Margin="5,0,4,0"
+                                         Foreground="{DynamicResource AccentBrush}" Background="{DynamicResource StrokeSubtle}" BorderThickness="0" VerticalAlignment="Center" />
+                            <TextBlock x:Name="DockCpuText" Text="0%" FontSize="11" FontWeight="SemiBold" MinWidth="25" VerticalAlignment="Center" />
+                            <Border Width="1" Height="14" Background="{DynamicResource StrokeSubtle}" Margin="5,0" VerticalAlignment="Center" />
+                            <TextBlock Text="RAM" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
+                            <ProgressBar x:Name="DockRamBar" Width="22" Height="4" Minimum="0" Maximum="100" Margin="5,0,4,0"
+                                         Foreground="{DynamicResource PositiveBrush}" Background="{DynamicResource StrokeSubtle}" BorderThickness="0" VerticalAlignment="Center" />
+                            <TextBlock x:Name="DockRamText" Text="0%" FontSize="11" FontWeight="SemiBold" MinWidth="25" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Live Pomodoro Focus Timer Capsule -->
+                    <Button x:Name="PomodoroMiniButton" Style="{StaticResource DockCapsuleButton}"
+                            Click="PomodoroMiniButton_Click" MouseRightButtonUp="PomodoroMiniButton_RightClick"
+                            Margin="6,0,0,0" Padding="9,0" ToolTip="{local:Loc PomodoroTooltip}" ToolTipService.InitialShowDelay="450">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Path x:Name="DockPomodoroGlyph" Data="{StaticResource IconTimer}" Width="13.5" Height="13.5" Stretch="Uniform"
+                                  Stroke="{DynamicResource AccentBrush}" StrokeThickness="1.8"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" VerticalAlignment="Center" />
+                            <TextBlock x:Name="DockPomodoroText" Text="25:00" FontSize="11.5" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimary}" Margin="5,0,0,0" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Live Claude / AI Limits Capsule -->
+                    <Button x:Name="AiLimitsMiniButton" Style="{StaticResource DockCapsuleButton}"
+                            Click="WidgetsButton_Click"
+                            Margin="6,0,0,0" Padding="9,0" ToolTip="{local:Loc AiLimits}" ToolTipService.InitialShowDelay="450">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Path Data="{StaticResource IconSparkles}" Width="13" Height="13" Stretch="Uniform"
+                                  Stroke="#FFE58E5A" StrokeThickness="1.8"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" VerticalAlignment="Center" />
+                            <TextBlock Text="Claude" FontSize="11" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimary}" Margin="5,0,5,0" VerticalAlignment="Center" />
+                            <ProgressBar x:Name="DockClaudeBar" Width="22" Height="4" Minimum="0" Maximum="100"
+                                         Foreground="#FFE58E5A" Background="{DynamicResource StrokeSubtle}" BorderThickness="0" VerticalAlignment="Center" />
+                            <TextBlock x:Name="DockClaudeText" Text="0%" FontSize="11" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextSecondary}" Margin="4,0,0,0" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Next calendar event capsule -->
+                    <Button x:Name="CalendarMiniButton" Style="{StaticResource DockCapsuleButton}" Click="WidgetsButton_Click"
+                            Margin="6,0,0,0" Padding="9,0" ToolTip="{local:Loc WidgetCalendar}" ToolTipService.InitialShowDelay="450">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Path Data="{StaticResource IconTimer}" Width="13" Height="13" Stretch="Uniform"
+                                  Stroke="{DynamicResource AccentBrush}" StrokeThickness="1.8"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" VerticalAlignment="Center" />
+                            <TextBlock x:Name="DockCalendarText" Text="--" FontSize="11" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimary}" Margin="6,0,0,0" MaxWidth="170"
+                                       TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
+                    <!-- World clocks capsule -->
+                    <Button x:Name="WorldClockMiniButton" Style="{StaticResource DockCapsuleButton}" Click="WidgetsButton_Click"
+                            Margin="6,0,0,0" Padding="9,0" ToolTip="{local:Loc WorldClocksCard}" ToolTipService.InitialShowDelay="450">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Path Data="{StaticResource IconGlobe}" Width="13" Height="13" Stretch="Uniform"
+                                  Stroke="{DynamicResource AccentBrush}" StrokeThickness="1.7"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" VerticalAlignment="Center" />
+                            <TextBlock x:Name="DockWorldClockText" Text="--" FontSize="11" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimary}" Margin="6,0,0,0" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <!-- CENTER ZONE: App Dock Icons (Pinned + Running) -->
+                <Border Grid.Column="1" Width="1" Height="22" Background="{DynamicResource StrokeSubtle}" Margin="7,0,5,0" VerticalAlignment="Center" />
+                <Border x:Name="AppDockContainer" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <ItemsControl x:Name="PinnedApps" ItemTemplate="{StaticResource DockAppIconTemplate}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                        <Border x:Name="RunningAppsDivider" Width="1" Height="22" Background="{DynamicResource StrokeSubtle}"
+                                Margin="4,0,4,0" Visibility="Collapsed" VerticalAlignment="Center" />
+                        <ItemsControl x:Name="RunningApps" ItemTemplate="{StaticResource DockAppIconTemplate}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                        <TextBlock x:Name="StatusText" Foreground="{DynamicResource DangerText}" FontSize="{StaticResource TextSizeCaption}"
+                                   MaxWidth="200" VerticalAlignment="Center" Margin="6,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <Trigger Property="Text" Value="">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="3" Width="1" Height="22" Background="{DynamicResource StrokeSubtle}" Margin="5,0,7,0" VerticalAlignment="Center" />
+
+                <!-- RIGHT ZONE: Optional Right Capsules + Clock -->
+                <StackPanel x:Name="SystemTrayPanel" Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Live Now Playing Media Capsule -->
+                    <Border x:Name="DockMediaCapsule" Background="{DynamicResource WidgetCardSurface}"
+                            BorderBrush="{DynamicResource WidgetCardBorder}" BorderThickness="1"
+                            CornerRadius="10" Height="32" Padding="6,0" Margin="0,0,6,0">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Style="{StaticResource DockMiniIconButton}" Width="22" Height="22" Click="WidgetsButton_Click"
+                                    ToolTip="{local:Loc NowPlaying}">
+                                <Border Width="22" Height="22" CornerRadius="6" Background="{DynamicResource SurfaceHover}" ClipToBounds="True">
+                                    <Grid>
+                                        <Path x:Name="DockMediaFallbackGlyph" Data="{StaticResource IconMusic}" Width="12" Height="12" Stretch="Uniform"
+                                              Stroke="{DynamicResource AccentBrush}" StrokeThickness="1.8"
+                                              StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                                              HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        <Image x:Name="DockMediaArtImage" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" Visibility="Collapsed" />
+                                    </Grid>
+                                </Border>
+                            </Button>
+                            <TextBlock x:Name="DockMediaTitleText" Text="{local:Loc NowPlaying}" FontSize="11" FontWeight="Medium"
+                                       Foreground="{DynamicResource TextPrimary}" MaxWidth="96" Margin="6,0,5,0"
+                                       TextTrimming="CharacterEllipsis" VerticalAlignment="Center"
+                                       Cursor="Hand" MouseLeftButtonUp="DockMediaTitle_Click" />
+                            <Button Style="{StaticResource DockMiniIconButton}" Click="DockMediaPrev_Click">
+                                <Path Data="{StaticResource IconSkipPrev}" Width="11" Height="11" Stretch="Uniform"
+                                      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                      StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" />
+                            </Button>
+                            <Button Style="{StaticResource DockMiniIconButton}" Click="DockMediaPlayPause_Click">
+                                <Path x:Name="DockMediaPlayPauseGlyph" Data="{StaticResource IconPlay}" Width="11" Height="11" Stretch="Uniform"
+                                      Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                            </Button>
+                            <Button Style="{StaticResource DockMiniIconButton}" Click="DockMediaNext_Click">
+                                <Path Data="{StaticResource IconSkipNext}" Width="11" Height="11" Stretch="Uniform"
+                                      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                      StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" />
+                            </Button>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Live Market Ticker Capsule -->
+                    <Button x:Name="MarketTickerButton" Style="{StaticResource DockCapsuleButton}" Click="MarketTickerButton_Click"
+                            MouseRightButtonUp="WidgetsButton_RightClick"
+                            Margin="0,0,6,0" Padding="9,0" ToolTip="{local:Loc Markets}" ToolTipService.InitialShowDelay="450">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock x:Name="DockTickerNameText" Text="USD/TRY" FontSize="11" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
+                            <TextBlock x:Name="DockTickerPriceText" Text="--" FontSize="11.5" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimary}" Margin="6,0,5,0" VerticalAlignment="Center" />
+                            <Border x:Name="DockTickerBadge" Background="{DynamicResource PositiveSurface}" CornerRadius="5" Padding="5,1" VerticalAlignment="Center">
+                                <TextBlock x:Name="DockTickerChangeText" Text="0.0%" FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource PositiveBrush}" />
+                            </Border>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Control Center Status Capsule (Wi-Fi + Volume + Battery; Scroll Wheel adjusts Volume!) -->
+                    <Button x:Name="StatusMiniButton" Style="{StaticResource DockCapsuleButton}" Click="WidgetsButton_Click"
+                            PreviewMouseWheel="StatusMiniButton_PreviewMouseWheel"
+                            Padding="9,0" Margin="0,0,6,0" ToolTip="{local:Loc OpenWidgets}" ToolTipService.InitialShowDelay="450">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Path x:Name="DockNetworkGlyph" Data="{StaticResource IconWifi}" Width="13.5" Height="13.5" Stretch="Uniform"
+                                  Stroke="{DynamicResource TextPrimary}"
+                                  StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" VerticalAlignment="Center" />
+                            <Path x:Name="DockVolumeGlyph" Data="{StaticResource IconVolume}" Width="13.5" Height="13.5" Stretch="Uniform"
+                                  Stroke="{DynamicResource TextPrimary}"
+                                  StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                                  Margin="7,0,0,0" VerticalAlignment="Center" />
+                            <TextBlock x:Name="DockVolumeText" FontSize="11" Foreground="{DynamicResource TextSecondary}"
+                                       Margin="3,0,0,0" VerticalAlignment="Center" />
+                            <StackPanel x:Name="DockBatteryPanel" Orientation="Horizontal" VerticalAlignment="Center" Margin="7,0,0,0" Visibility="Collapsed">
+                                <Path x:Name="DockBatteryGlyph" Data="{StaticResource IconBattery}" Width="13.5" Height="13.5" Stretch="Uniform"
+                                      Stroke="{DynamicResource PositiveBrush}"
+                                      StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" VerticalAlignment="Center" />
+                                <TextBlock x:Name="DockBatteryText" FontSize="11" Foreground="{DynamicResource TextSecondary}"
+                                           Margin="3,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Widgets Hub, Settings, Clock & Show Desktop -->
+                    <Button Style="{StaticResource DockUtilityButton}" Click="WidgetsButton_Click"
+                            AutomationProperties.Name="{local:Loc OpenWidgets}" ToolTip="{local:Loc OpenWidgets}"
+                            ToolTipService.InitialShowDelay="450">
+                        <Path Data="{StaticResource IconWidgets}" Width="14.5" Height="14.5" Stretch="Uniform"
+                              Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                              StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" />
+                    </Button>
+                    <Button Style="{StaticResource DockUtilityButton}" Click="OpenSettings_Click"
+                            AutomationProperties.Name="{local:Loc Settings}" ToolTip="{local:Loc Settings}"
+                            ToolTipService.InitialShowDelay="450">
+                        <Path Data="{StaticResource IconSettings}" Width="14.5" Height="14.5" Stretch="Uniform"
+                              Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                              StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" />
+                    </Button>
+                    <Button x:Name="ClockButton" Style="{StaticResource DockCapsuleButton}" Click="WidgetsButton_Click"
+                            Padding="9,2" Margin="3,0,2,0" ToolTipService.InitialShowDelay="450">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock x:Name="ClockTimeText" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimary}" HorizontalAlignment="Center"
+                                       LineHeight="13" LineStackingStrategy="BlockLineHeight" />
+                            <TextBlock x:Name="ClockDateText" FontSize="10"
+                                       Foreground="{DynamicResource TextSecondary}" HorizontalAlignment="Center"
+                                       LineHeight="11" LineStackingStrategy="BlockLineHeight" />
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource DockUtilityButton}" Click="ShowDesktop_Click"
+                            AutomationProperties.Name="{local:Loc ShowDesktop}" ToolTip="{local:Loc ShowDesktop}"
+                            ToolTipService.InitialShowDelay="450">
+                        <Path Data="{StaticResource IconDesktop}" Width="14.5" Height="14.5" Stretch="Uniform"
+                              Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                              StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+        <Border x:Name="DockEdgeTrigger" Grid.Row="1" VerticalAlignment="Bottom" Height="3" Background="#01000000"
+                MouseEnter="DockEdgeTrigger_MouseEnter" MouseLeave="DockEdgeTrigger_MouseLeave" />
     </Grid>
 </Window>

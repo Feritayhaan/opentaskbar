@@ -8,6 +8,7 @@ using System.Windows.Interop;
 using System.Windows.Shell;
 using OpenTaskbar.Models;
 using OpenTaskbar.Services;
+using OpenTaskbar.Services.Widgets;
 
 namespace OpenTaskbar;
 
@@ -42,12 +43,32 @@ public partial class SettingsWindow : Window
         LeftPosition.IsChecked = _applied.Position == DockPosition.Left;
         CenterPosition.IsChecked = _applied.Position == DockPosition.Center;
         RightPosition.IsChecked = _applied.Position == DockPosition.Right;
+        EdgeBottomRadio.IsChecked = _applied.Edge == DockEdge.Bottom;
+        EdgeTopRadio.IsChecked = _applied.Edge == DockEdge.Top;
+        LayoutPillRadio.IsChecked = _applied.Layout == DockLayout.Pill;
+        LayoutFullRadio.IsChecked = _applied.Layout == DockLayout.FullWidth;
+        StyleGlassRadio.IsChecked = _applied.Style == BarStyle.Glass;
+        StyleWhiteRadio.IsChecked = _applied.Style == BarStyle.White;
+        StyleIosRadio.IsChecked = _applied.Style == BarStyle.IosGlass;
+        StyleMidnightRadio.IsChecked = _applied.Style == BarStyle.Midnight;
+        StyleBlackRadio.IsChecked = _applied.Style == BarStyle.Black;
+        AutoMeetingToggle.IsChecked = _applied.AutoMeetingMedia;
+        AutoAiToggle.IsChecked = _applied.AutoAiLimitAlert;
+        AutoBatteryToggle.IsChecked = _applied.AutoLowBatteryAlert;
+        QuietHoursToggle.IsChecked = _applied.QuietHoursEnabled;
+        QuietStartBox.Text = _applied.QuietHoursStart;
+        QuietEndBox.Text = _applied.QuietHoursEnd;
+        CalendarUrlsBox.Text = string.Join(", ", _applied.CalendarUrls ?? []);
+        WorldClocksBox.Text = string.Join(", ", _applied.WorldClocks ?? []);
         AnimationsToggle.IsChecked = _applied.AnimationsEnabled;
         PreviewsToggle.IsChecked = _applied.PreviewsEnabled;
         BadgesToggle.IsChecked = _applied.NotificationBadgesEnabled;
         AutoHideDisabled.IsChecked = _applied.AutoHide == AutoHideMode.Disabled;
         AutoHideSmart.IsChecked = _applied.AutoHide == AutoHideMode.Smart;
         AutoHideAlways.IsChecked = _applied.AutoHide == AutoHideMode.Always;
+        SearchHotkeyToggle.IsChecked = _applied.SearchHotkeyEnabled;
+        WeatherCityBox.Text = _applied.WeatherCity ?? "";
+        MarketSymbolsBox.Text = string.Join(", ", _applied.EffectiveMarketSymbols);
         OpacitySlider.Value = _applied.SurfaceOpacity * 100;
         UpdateOpacityLabel();
         var startup = _startup.Read();
@@ -128,20 +149,67 @@ public partial class SettingsWindow : Window
         }
     }
 
-    private DockSettings ReadSelection() => _preferences.Current with
+    private DockSettings ReadSelection()
     {
-        Theme = LightTheme.IsChecked == true ? AppTheme.Light : AppTheme.Dark,
-        Language = EnglishLanguage.IsChecked == true ? AppLanguage.English : AppLanguage.Turkish,
-        Position = RightPosition.IsChecked == true ? DockPosition.Right : CenterPosition.IsChecked == true ? DockPosition.Center : DockPosition.Left,
-        AnimationsEnabled = AnimationsToggle.IsChecked == true,
-        PreviewsEnabled = PreviewsToggle.IsChecked == true,
-        NotificationBadgesEnabled = BadgesToggle.IsChecked == true,
-        AutoHide = AutoHideAlways.IsChecked == true ? AutoHideMode.Always : AutoHideSmart.IsChecked == true ? AutoHideMode.Smart : AutoHideMode.Disabled,
-        SurfaceOpacity = Math.Round(OpacitySlider.Value) / 100
-    };
+        var city = WeatherCityBox.Text.Trim();
+        var symbols = MarketSymbolsBox.Text
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(s => !string.IsNullOrWhiteSpace(s))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Take(8)
+            .ToList();
+        var calendars = CalendarUrlsBox.Text
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(u => !string.IsNullOrWhiteSpace(u))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Take(6)
+            .ToList();
+        var clocks = WorldClocksBox.Text
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(WorldClockService.IsKnownZone)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Take(6)
+            .ToList();
+        var quietStart = QuietHours.TryParseTime(QuietStartBox.Text, out var qs) ? qs.ToString(@"hh\:mm") : _applied.QuietHoursStart;
+        var quietEnd = QuietHours.TryParseTime(QuietEndBox.Text, out var qe) ? qe.ToString(@"hh\:mm") : _applied.QuietHoursEnd;
+        return _preferences.Current with
+        {
+            Theme = LightTheme.IsChecked == true ? AppTheme.Light : AppTheme.Dark,
+            Language = EnglishLanguage.IsChecked == true ? AppLanguage.English : AppLanguage.Turkish,
+            Position = RightPosition.IsChecked == true ? DockPosition.Right : CenterPosition.IsChecked == true ? DockPosition.Center : DockPosition.Left,
+            AnimationsEnabled = AnimationsToggle.IsChecked == true,
+            PreviewsEnabled = PreviewsToggle.IsChecked == true,
+            NotificationBadgesEnabled = BadgesToggle.IsChecked == true,
+            AutoHide = AutoHideAlways.IsChecked == true ? AutoHideMode.Always : AutoHideSmart.IsChecked == true ? AutoHideMode.Smart : AutoHideMode.Disabled,
+            SurfaceOpacity = Math.Round(OpacitySlider.Value) / 100,
+            WeatherCity = string.IsNullOrEmpty(city) ? null : city,
+            MarketSymbols = symbols.Count > 0 ? symbols : null,
+            SearchHotkeyEnabled = SearchHotkeyToggle.IsChecked == true,
+            Edge = EdgeTopRadio.IsChecked == true ? DockEdge.Top : DockEdge.Bottom,
+            Layout = LayoutFullRadio.IsChecked == true ? DockLayout.FullWidth : DockLayout.Pill,
+            Style = StyleWhiteRadio.IsChecked == true ? BarStyle.White
+                : StyleIosRadio.IsChecked == true ? BarStyle.IosGlass
+                : StyleMidnightRadio.IsChecked == true ? BarStyle.Midnight
+                : StyleBlackRadio.IsChecked == true ? BarStyle.Black
+                : BarStyle.Glass,
+            AutoMeetingMedia = AutoMeetingToggle.IsChecked == true,
+            AutoAiLimitAlert = AutoAiToggle.IsChecked == true,
+            AutoLowBatteryAlert = AutoBatteryToggle.IsChecked == true,
+            QuietHoursEnabled = QuietHoursToggle.IsChecked == true,
+            QuietHoursStart = quietStart,
+            QuietHoursEnd = quietEnd,
+            CalendarUrls = calendars.Count > 0 ? calendars : null,
+            WorldClocks = clocks.Count > 0 ? clocks : null
+        };
+    }
 
     private void Apply_Click(object sender, RoutedEventArgs e)
     {
+        if (!QuietHours.TryParseTime(QuietStartBox.Text, out _) || !QuietHours.TryParseTime(QuietEndBox.Text, out _))
+        {
+            ShowResult(UiText.Get("QuietHoursInvalid"), error: true);
+            return;
+        }
         var startupChanged = _startupAvailable && StartupToggle.IsChecked != _startupEnabled;
         if (startupChanged && _startup.SetEnabled(StartupToggle.IsChecked == true) is { } startupError)
         {
@@ -192,6 +260,9 @@ public partial class SettingsWindow : Window
         SaveStatus.Visibility = Visibility.Collapsed;
         UpdateApplyState();
     }
+
+    private void WidgetField_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e) =>
+        PreferenceEdited(sender, e);
 
     private void UpdateApplyState() => ApplyButton.IsEnabled = HasEdits() || _preferences.LoadError is not null;
 

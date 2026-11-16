@@ -1,0 +1,693 @@
+<Window x:Class="OpenTaskbar.WidgetsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:OpenTaskbar.Services"
+        Title="{local:Loc OpenWidgets}"
+        Width="428"
+        MaxHeight="820"
+        SizeToContent="Height"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        Topmost="True"
+        WindowStartupLocation="Manual"
+        FontFamily="{StaticResource InterfaceFont}"
+        Foreground="{DynamicResource TextPrimary}"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True"
+        PreviewKeyDown="Window_PreviewKeyDown"
+        Deactivated="Window_Deactivated">
+    <Window.Resources>
+        <Style x:Key="WidgetCard" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource WidgetCardSurface}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource WidgetCardBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="14" />
+            <Setter Property="Padding" Value="13,11" />
+            <Setter Property="Margin" Value="0,0,0,9" />
+        </Style>
+
+        <Style x:Key="WidgetIconButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Width" Value="30" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Surface" Background="{TemplateBinding Background}" CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Surface" Property="Background" Value="{DynamicResource SurfaceHover}" />
+                                <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Surface" Property="Background" Value="{DynamicResource SurfacePressed}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="WidgetActionPill" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource SurfaceHover}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Padding" Value="9,4" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Surface" Background="{TemplateBinding Background}" CornerRadius="7" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Surface" Property="Background" Value="{DynamicResource SurfacePressed}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="WidgetClickableCard" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource WidgetCardSurface}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource WidgetCardBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Padding" Value="13,11" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Surface" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="14" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Surface" Property="Background" Value="{DynamicResource SurfaceHover}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Surface" Property="Background" Value="{DynamicResource SurfacePressed}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="VolumeSlider" TargetType="Slider">
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Height" Value="22" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid VerticalAlignment="Center">
+                            <Border Height="5" CornerRadius="2.5" Background="{DynamicResource StrokeSubtle}" />
+                            <Track x:Name="PART_Track">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="Slider.DecreaseLarge" Focusable="False">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Height="5" CornerRadius="2.5" Background="{DynamicResource AccentBrush}" />
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="Slider.IncreaseLarge" Opacity="0" Focusable="False" />
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Width="15" Height="15" Cursor="Hand">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Ellipse Fill="{DynamicResource TextPrimary}" Stroke="{DynamicResource AccentBrush}" StrokeThickness="2" />
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Border Margin="14" CornerRadius="18" Background="{DynamicResource MenuMaterial}"
+            BorderBrush="{DynamicResource MenuStroke}" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect Color="#000000" BlurRadius="26" ShadowDepth="5" Direction="270" Opacity="0.45" RenderingBias="Performance" />
+        </Border.Effect>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Grid Grid.Row="0" Margin="16,13,12,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock x:Name="HeaderDateText" FontSize="15" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="{local:Loc OpenWidgets}" FontSize="11" Foreground="{DynamicResource TextSecondary}" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Style="{StaticResource WidgetIconButton}" Click="Refresh_Click"
+                            ToolTip="{local:Loc Refresh}" AutomationProperties.Name="{local:Loc Refresh}">
+                        <Path Data="{StaticResource IconRefresh}" Width="14" Height="14" Stretch="Uniform"
+                              Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                              StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" />
+                    </Button>
+                    <Button Style="{StaticResource WidgetIconButton}" Click="OpenNotifications_Click"
+                            ToolTip="{local:Loc Notifications}" AutomationProperties.Name="{local:Loc Notifications}">
+                        <Path Data="{StaticResource IconOpen}" Width="14" Height="14" Stretch="Uniform"
+                              Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                              StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" />
+                    </Button>
+                    <Button Style="{StaticResource WidgetIconButton}" Click="OpenSettings_Click"
+                            ToolTip="{local:Loc Settings}" AutomationProperties.Name="{local:Loc Settings}">
+                        <Path Data="{StaticResource IconSettings}" Width="14" Height="14" Stretch="Uniform"
+                              Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                              StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <!-- Scrollable Widget Stack -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                          Padding="14,0,14,12">
+                <StackPanel>
+                    <!-- Bar Widget Customizer Card (Add / Remove widgets from the bottom bar with 1 click!) -->
+                    <Border Style="{StaticResource WidgetCard}">
+                        <StackPanel>
+                            <TextBlock Text="{local:Loc BarWidgetsTitle}" FontSize="11.5" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,6" />
+                            <WrapPanel x:Name="BarWidgetPickerPanel" Orientation="Horizontal" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 0. AI Usage & Limits Card (Claude, Gemini/Antigravity, ChatGPT/Codex) -->
+                    <Border Style="{StaticResource WidgetCard}">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Path Data="{StaticResource IconSparkles}" Width="13" Height="13" Stretch="Uniform"
+                                          Stroke="#FFE58E5A" StrokeThickness="1.8"
+                                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                                          VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <TextBlock Text="{local:Loc AiLimits}" FontSize="12" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
+                                </StackPanel>
+                                <Button Grid.Column="1" Content="{local:Loc CheckAgain}" Style="{StaticResource WidgetActionPill}"
+                                        Click="CheckAiLimits_Click" />
+                            </Grid>
+                            <StackPanel x:Name="AiLimitsListPanel" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 0b. Background Apps & Memory Manager Card -->
+                    <Border Style="{StaticResource WidgetCard}">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{local:Loc BackgroundApps}" FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <Button Content="{local:Loc SystemTrayIcons}" Style="{StaticResource WidgetActionPill}"
+                                            Click="SystemTrayIcons_Click" Margin="0,0,5,0" />
+                                    <Button Content="{local:Loc TaskManager}" Style="{StaticResource WidgetActionPill}"
+                                            Click="TaskManager_Click" />
+                                </StackPanel>
+                            </Grid>
+                            <StackPanel x:Name="BackgroundAppsListPanel" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 0c. Screen Time & Recycle Bin Card -->
+                    <Border Style="{StaticResource WidgetCard}">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{local:Loc ScreenTime}" FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
+                                <TextBlock x:Name="TotalScreenTimeText" Grid.Column="1" FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                            </Grid>
+                            <StackPanel x:Name="ScreenTimeListPanel" Margin="0,0,0,8" />
+                            <Border Height="1" Background="{DynamicResource StrokeSubtle}" Margin="0,0,0,7" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Path Data="{StaticResource IconTrash}" Width="14" Height="14" Stretch="Uniform"
+                                      Stroke="{DynamicResource TextSecondary}" StrokeThickness="1.7"
+                                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                                      VerticalAlignment="Center" Margin="0,0,7,0" />
+                                <TextBlock x:Name="RecycleBinStatusText" Grid.Column="1" FontSize="11.5"
+                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                    <Button Content="{local:Loc HintOpen}" Style="{StaticResource WidgetActionPill}"
+                                            Click="OpenRecycleBin_Click" Margin="0,0,5,0" />
+                                    <Button x:Name="EmptyRecycleBinBtn" Content="{local:Loc EmptyBin}" Style="{StaticResource WidgetActionPill}"
+                                            Click="EmptyRecycleBin_Click" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 1. Volume Control Center Card -->
+                    <Border Style="{StaticResource WidgetCard}">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{local:Loc Volume}" FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock x:Name="VolumePercentText" FontSize="12" FontWeight="SemiBold"
+                                               VerticalAlignment="Center" Margin="0,0,8,0" />
+                                    <Button Content="{local:Loc SoundSettings}" Style="{StaticResource WidgetActionPill}"
+                                            Click="SoundSettings_Click" />
+                                </StackPanel>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Button Style="{StaticResource WidgetIconButton}" Click="Mute_Click"
+                                        ToolTip="{local:Loc Mute}" Margin="0,0,8,0">
+                                    <Path x:Name="VolumeGlyph" Data="{StaticResource IconVolume}" Width="16" Height="16" Stretch="Uniform"
+                                          Stroke="{DynamicResource TextPrimary}" StrokeThickness="1.7"
+                                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" />
+                                </Button>
+                                <Slider x:Name="VolumeSliderControl" Grid.Column="1" Minimum="0" Maximum="100"
+                                        Style="{StaticResource VolumeSlider}"
+                                        ValueChanged="VolumeSlider_ValueChanged" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 2. Network & Battery Row -->
+                    <Grid Margin="0,0,0,9">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="9" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Style="{StaticResource WidgetClickableCard}" Click="NetworkCard_Click">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Border Width="32" Height="32" CornerRadius="16" Background="{DynamicResource AccentBrush}" Margin="0,0,10,0">
+                                    <Path x:Name="NetworkGlyph" Data="{StaticResource IconWifi}" Width="16" Height="16" Stretch="Uniform"
+                                          Stroke="{DynamicResource AccentText}" StrokeThickness="1.8"
+                                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock x:Name="NetworkTitleText" FontSize="12.5" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock x:Name="NetworkSubtitleText" FontSize="11" Foreground="{DynamicResource TextSecondary}" TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                            </Grid>
+                        </Button>
+                        <Button Grid.Column="2" Style="{StaticResource WidgetClickableCard}" Click="BatteryCard_Click">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Border Width="32" Height="32" CornerRadius="16" Background="{DynamicResource PositiveSurface}" Margin="0,0,10,0">
+                                    <Path x:Name="BatteryGlyph" Data="{StaticResource IconBattery}" Width="16" Height="16" Stretch="Uniform"
+                                          Stroke="{DynamicResource PositiveBrush}" StrokeThickness="1.8"
+                                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock x:Name="BatteryTitleText" FontSize="12.5" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock x:Name="BatterySubtitleText" FontSize="11" Foreground="{DynamicResource TextSecondary}" TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                            </Grid>
+                        </Button>
+                    </Grid>
+
+                    <!-- 2b. Quick Settings shortcuts -->
+                    <Border Style="{StaticResource WidgetCard}">
+                        <StackPanel>
+                            <TextBlock Text="{local:Loc QuickToggles}" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,6" />
+                            <WrapPanel>
+                                <Button Content="{local:Loc Brightness}" Tag="ms-settings:display" Style="{StaticResource WidgetActionPill}" Click="QuickSetting_Click" Margin="0,0,5,5" Padding="9,5" />
+                                <Button Content="{local:Loc NightLight}" Tag="ms-settings:nightlight" Style="{StaticResource WidgetActionPill}" Click="QuickSetting_Click" Margin="0,0,5,5" Padding="9,5" />
+                                <Button Content="{local:Loc FocusAssist}" Tag="ms-settings:quiethours" Style="{StaticResource WidgetActionPill}" Click="QuickSetting_Click" Margin="0,0,5,5" Padding="9,5" />
+                                <Button Content="{local:Loc Bluetooth}" Tag="ms-settings:bluetooth" Style="{StaticResource WidgetActionPill}" Click="QuickSetting_Click" Margin="0,0,5,5" Padding="9,5" />
+                                <Button Content="{local:Loc Airplane}" Tag="ms-settings:network-airplanemode" Style="{StaticResource WidgetActionPill}" Click="QuickSetting_Click" Margin="0,0,5,5" Padding="9,5" />
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 3. Now Playing Media Card -->
+                    <Border Style="{StaticResource WidgetCard}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="46" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Border Width="46" Height="46" CornerRadius="10" Background="{DynamicResource SurfaceHover}" ClipToBounds="True">
+                                <Grid>
+                                    <Path x:Name="MediaFallbackGlyph" Data="{StaticResource IconMusic}" Width="18" Height="18" Stretch="Uniform"
+                                          Stroke="{DynamicResource TextSecondary}" StrokeThickness="1.7"
+                                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    <Image x:Name="MediaArtImage" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
+                                </Grid>
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="11,0,8,0">
+                                <TextBlock Text="{local:Loc NowPlaying}" FontSize="10.5" Foreground="{DynamicResource TextSecondary}" />
+                                <TextBlock x:Name="MediaTitleText" Text="{local:Loc NothingPlaying}" FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                <TextBlock x:Name="MediaArtistText" FontSize="11" Foreground="{DynamicResource TextSecondary}" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button x:Name="MediaPrevButton" Style="{StaticResource WidgetIconButton}" Click="MediaPrev_Click">
+                                    <Path Data="{StaticResource IconSkipPrev}" Width="13" Height="13" Stretch="Uniform"
+                                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                          StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" />
+                                </Button>
+                                <Button x:Name="MediaPlayPauseButton" Style="{StaticResource WidgetIconButton}" Click="MediaPlayPause_Click">
+                                    <Path x:Name="MediaPlayPauseGlyph" Data="{StaticResource IconPlay}" Width="14" Height="14" Stretch="Uniform"
+                                          Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                                </Button>
+                                <Button x:Name="MediaNextButton" Style="{StaticResource WidgetIconButton}" Click="MediaNext_Click">
+                                    <Path Data="{StaticResource IconSkipNext}" Width="13" Height="13" Stretch="Uniform"
+                                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                          StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" />
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- 4. Calendar + Weather Row -->
+                    <Grid Margin="0,0,0,9">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.15*" />
+                            <ColumnDefinition Width="9" />
+                            <ColumnDefinition Width="0.95*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Calendar Card -->
+                        <Border Grid.Column="0" Style="{StaticResource WidgetCard}" Margin="0">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock x:Name="CalendarMonthText" FontSize="12.5" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <Button Style="{StaticResource WidgetIconButton}" Width="22" Height="22" Click="PrevMonth_Click">
+                                            <Path Data="{StaticResource IconChevronLeft}" Width="11" Height="11" Stretch="Uniform"
+                                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                  StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                                        </Button>
+                                        <Button Style="{StaticResource WidgetIconButton}" Width="22" Height="22" Click="NextMonth_Click">
+                                            <Path Data="{StaticResource IconChevronRight}" Width="11" Height="11" Stretch="Uniform"
+                                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                  StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                                <UniformGrid x:Name="CalendarWeekdays" Columns="7" Margin="0,0,0,3" />
+                                <UniformGrid x:Name="CalendarDaysGrid" Columns="7" Rows="6" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Weather Card -->
+                        <Border Grid.Column="2" Style="{StaticResource WidgetCard}" Margin="0">
+                            <Grid>
+                                <StackPanel x:Name="WeatherContentPanel">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock x:Name="WeatherCityText" Text="{local:Loc Weather}" FontSize="12.5" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                        <Path x:Name="WeatherGlyph" Grid.Column="1" Data="{StaticResource IconCloudSun}" Width="20" Height="20" Stretch="Uniform"
+                                              Stroke="{DynamicResource AccentBrush}" StrokeThickness="1.8"
+                                              StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" />
+                                    </Grid>
+                                    <TextBlock x:Name="WeatherTempText" Text="--°" FontSize="30" FontWeight="SemiBold" Margin="0,4,0,0" />
+                                    <TextBlock x:Name="WeatherConditionText" Text="{local:Loc Loading}" FontSize="11.5"
+                                               Foreground="{DynamicResource TextSecondary}" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock x:Name="WeatherHighLowText" FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,8,0,2" />
+                                    <TextBlock x:Name="WeatherDetailsText" FontSize="10.5" Foreground="{DynamicResource TextSecondary}" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Grid>
+
+                    <!-- 4b. Upcoming calendar events (iCal) -->
+                    <Border Style="{StaticResource WidgetCard}">
+                        <StackPanel>
+                            <TextBlock x:Name="UpcomingTitleText" Text="{local:Loc Upcoming}" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,6" />
+                            <StackPanel x:Name="UpcomingEventsPanel" />
+                            <TextBlock x:Name="UpcomingStatusText" FontSize="11.5" TextWrapping="Wrap"
+                                       Foreground="{DynamicResource TextSecondary}" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 5. System Monitor Card (CPU / RAM / Disk) -->
+                    <Border Style="{StaticResource WidgetCard}">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{local:Loc SystemMonitor}" FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
+                                <Button Grid.Column="1" Content="{local:Loc TaskManager}" Style="{StaticResource WidgetActionPill}"
+                                        Click="TaskManager_Click" />
+                            </Grid>
+                            <Grid Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="64" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{local:Loc Cpu}" FontSize="11.5" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
+                                <ProgressBar x:Name="CpuBar" Grid.Column="1" Height="6" Minimum="0" Maximum="100" VerticalAlignment="Center"
+                                             Foreground="{DynamicResource AccentBrush}" Background="{DynamicResource StrokeSubtle}" BorderThickness="0" />
+                                <TextBlock x:Name="CpuValueText" Grid.Column="2" FontSize="11.5" FontWeight="SemiBold" MinWidth="42" TextAlignment="Right" Margin="8,0,0,0" />
+                            </Grid>
+                            <Grid Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="64" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{local:Loc Memory}" FontSize="11.5" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
+                                <ProgressBar x:Name="MemoryBar" Grid.Column="1" Height="6" Minimum="0" Maximum="100" VerticalAlignment="Center"
+                                             Foreground="{DynamicResource PositiveBrush}" Background="{DynamicResource StrokeSubtle}" BorderThickness="0" />
+                                <TextBlock x:Name="MemoryValueText" Grid.Column="2" FontSize="11.5" FontWeight="SemiBold" MinWidth="82" TextAlignment="Right" Margin="8,0,0,0" />
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="64" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{local:Loc Disk}" FontSize="11.5" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
+                                <ProgressBar x:Name="DiskBar" Grid.Column="1" Height="6" Minimum="0" Maximum="100" VerticalAlignment="Center"
+                                             Foreground="{DynamicResource WindowsLogoBrush}" Background="{DynamicResource StrokeSubtle}" BorderThickness="0" />
+                                <TextBlock x:Name="DiskValueText" Grid.Column="2" FontSize="11.5" FontWeight="SemiBold" MinWidth="82" TextAlignment="Right" Margin="8,0,0,0" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 5b. World Clocks -->
+                    <Border Style="{StaticResource WidgetCard}">
+                        <StackPanel>
+                            <TextBlock Text="{local:Loc WorldClocksCard}" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,6" />
+                            <UniformGrid x:Name="WorldClocksPanel" Columns="3" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 6. Pomodoro Focus & Quick Notes / To-Dos -->
+                    <Border Style="{StaticResource WidgetCard}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock x:Name="PomodoroModeLabel" Text="{local:Loc FocusSession}" FontSize="11"
+                                           Foreground="{DynamicResource TextSecondary}" />
+                                <TextBlock x:Name="PomodoroTimeText" Text="25:00" FontSize="22" FontWeight="SemiBold" Margin="0,1,0,0" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button x:Name="PomodoroToggleBtn" Content="{local:Loc StartPause}" Style="{StaticResource WidgetActionPill}"
+                                        Click="PomodoroToggle_Click" Margin="0,0,6,0" />
+                                <Button Content="{local:Loc Reset}" Style="{StaticResource WidgetActionPill}"
+                                        Click="PomodoroReset_Click" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- 6b. Countdown timer & stopwatch -->
+                    <Border Style="{StaticResource WidgetCard}">
+                        <StackPanel>
+                            <TextBlock Text="{local:Loc TimerTitle}" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,6" />
+                            <Grid Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="{local:Loc TimerLabel}" FontSize="11" Foreground="{DynamicResource TextSecondary}" />
+                                    <TextBlock x:Name="TimerTimeText" Text="10:00" FontSize="22" FontWeight="SemiBold" Margin="0,1,0,0" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button x:Name="TimerToggleBtn" Content="{local:Loc Run}" Style="{StaticResource WidgetActionPill}"
+                                            Click="TimerToggle_Click" Margin="0,0,6,0" />
+                                    <Button Content="{local:Loc Reset}" Style="{StaticResource WidgetActionPill}" Click="TimerReset_Click" />
+                                </StackPanel>
+                            </Grid>
+                            <WrapPanel x:Name="TimerPresetPanel" Margin="0,0,0,8" />
+                            <Border Height="1" Background="{DynamicResource StrokeSubtle}" Margin="0,0,0,8" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="{local:Loc StopwatchLabel}" FontSize="11" Foreground="{DynamicResource TextSecondary}" />
+                                    <TextBlock x:Name="StopwatchTimeText" Text="00:00.0" FontSize="22" FontWeight="SemiBold" Margin="0,1,0,0" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button x:Name="StopwatchToggleBtn" Content="{local:Loc Run}" Style="{StaticResource WidgetActionPill}"
+                                            Click="StopwatchToggle_Click" Margin="0,0,6,0" />
+                                    <Button Content="{local:Loc Reset}" Style="{StaticResource WidgetActionPill}" Click="StopwatchReset_Click" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 7. Quick Notes & To-Do Checklist Card -->
+                    <Border Style="{StaticResource WidgetCard}">
+                        <StackPanel>
+                            <TextBlock Text="{local:Loc NotesAndTodos}" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,6" />
+                            <Grid Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="TodoInputBox" Padding="8,5" FontSize="12"
+                                         Background="{DynamicResource SurfaceSelected}" Foreground="{DynamicResource TextPrimary}"
+                                         BorderBrush="{DynamicResource StrokeSubtle}" BorderThickness="1"
+                                         CaretBrush="{DynamicResource AccentBrush}"
+                                         KeyDown="TodoInputBox_KeyDown" />
+                                <Button Grid.Column="1" Style="{StaticResource WidgetIconButton}" Width="28" Height="28"
+                                        Margin="6,0,0,0" Click="AddTodo_Click">
+                                    <Path Data="{StaticResource IconPlus}" Width="13" Height="13" Stretch="Uniform"
+                                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                          StrokeThickness="1.9" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                                </Button>
+                            </Grid>
+                            <StackPanel x:Name="TodosListPanel" Margin="0,0,0,6" />
+                            <TextBox x:Name="QuickNoteBox" AcceptsReturn="True" TextWrapping="Wrap"
+                                     MinHeight="48" MaxHeight="84" Padding="8,6" FontSize="11.5"
+                                     VerticalScrollBarVisibility="Auto"
+                                     Background="{DynamicResource SurfaceSelected}" Foreground="{DynamicResource TextPrimary}"
+                                     BorderBrush="{DynamicResource StrokeSubtle}" BorderThickness="1"
+                                     CaretBrush="{DynamicResource AccentBrush}"
+                                     TextChanged="QuickNoteBox_TextChanged" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 7b. Recent files & Downloads -->
+                    <Border Style="{StaticResource WidgetCard}">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{local:Loc RecentFiles}" FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
+                                <Button Grid.Column="1" Content="{local:Loc OpenFolder}" Style="{StaticResource WidgetActionPill}"
+                                        Click="OpenDownloads_Click" />
+                            </Grid>
+                            <StackPanel x:Name="RecentFilesPanel" />
+                            <TextBlock x:Name="RecentFilesStatusText" Text="{local:Loc NoRecentFiles}" FontSize="11.5"
+                                       Foreground="{DynamicResource TextSecondary}" Visibility="Collapsed" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 8. Markets Card -->
+                    <Border Style="{StaticResource WidgetCard}">
+                        <StackPanel>
+                            <TextBlock Text="{local:Loc Markets}" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,6" />
+                            <StackPanel x:Name="MarketsListPanel" />
+                            <TextBlock x:Name="MarketsStatusText" Text="{local:Loc Loading}" FontSize="11.5"
+                                       Foreground="{DynamicResource TextSecondary}" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 7. Top Stories / News Card -->
+                    <Border Style="{StaticResource WidgetCard}" Margin="0">
+                        <StackPanel>
+                            <TextBlock Text="{local:Loc News}" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,6" />
+                            <StackPanel x:Name="NewsListPanel" />
+                            <TextBlock x:Name="NewsStatusText" Text="{local:Loc Loading}" FontSize="11.5"
+                                       Foreground="{DynamicResource TextSecondary}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Border>
+</Window>

@@ -21,12 +21,14 @@
     <SolidColorBrush x:Key="IndicatorBrush" Color="#A8E4F3FF" />
     <SolidColorBrush x:Key="IndicatorForegroundBrush" Color="#FFFFFFFF" />
     <LinearGradientBrush x:Key="DockMaterial" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#CC1E2530" Offset="0" />
-        <GradientStop Color="#E210141C" Offset="1" />
+        <GradientStop Color="#E61C2330" Offset="0" />
+        <GradientStop Color="#EE121722" Offset="0.45" />
+        <GradientStop Color="#F40D1119" Offset="1" />
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="DockBorderMaterial" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#4DFFFFFF" Offset="0" />
-        <GradientStop Color="#16FFFFFF" Offset="1" />
+        <GradientStop Color="#68D8ECFF" Offset="0" />
+        <GradientStop Color="#22FFFFFF" Offset="0.4" />
+        <GradientStop Color="#18FFFFFF" Offset="1" />
     </LinearGradientBrush>
     <SolidColorBrush x:Key="SettingsBackground" Color="#FF181A1E" />
     <SolidColorBrush x:Key="SettingsSidebar" Color="#FF121417" />
@@ -38,4 +40,10 @@
     <SolidColorBrush x:Key="MenuDivider" Color="#20FFFFFF" />
     <SolidColorBrush x:Key="SettingsSidebarOverlay" Color="#2410141A" />
     <SolidColorBrush x:Key="CaptionCloseForeground" Color="#FFFFFFFF" />
+    <SolidColorBrush x:Key="WidgetCardSurface" Color="#1CFFFFFF" />
+    <SolidColorBrush x:Key="WidgetCardBorder" Color="#2EFFFFFF" />
+    <SolidColorBrush x:Key="PositiveBrush" Color="#FF58D68D" />
+    <SolidColorBrush x:Key="PositiveSurface" Color="#2458D68D" />
+    <SolidColorBrush x:Key="NegativeBrush" Color="#FFFF7A85" />
+    <SolidColorBrush x:Key="NegativeSurface" Color="#24FF7A85" />
 </ResourceDictionary>

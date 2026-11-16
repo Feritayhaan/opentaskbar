@@ -19,11 +19,8 @@ public static class ApplicationIconProvider
             {
                 return executableIcon;
             }
-
-            return null;
         }
-
-        if (File.Exists(path))
+        else if (File.Exists(path))
         {
             var directIcon = GetExecutableIcon(path);
             if (directIcon is not null)

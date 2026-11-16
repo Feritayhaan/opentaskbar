@@ -22,6 +22,7 @@ public sealed class DockAutoHideController : IDisposable
     private bool _disposed;
 
     public AutoHideMode Mode { get; private set; } = AutoHideMode.Disabled;
+    public DockEdge Edge { get; private set; } = DockEdge.Bottom;
     public bool IsHidden { get; private set; }
     public bool IsMouseOverDock { get; private set; }
     public bool IsMouseAtEdge { get; private set; }
@@ -47,6 +48,24 @@ public sealed class DockAutoHideController : IDisposable
             Interval = TimeSpan.FromMilliseconds(400)
         };
         _hideTimer.Tick += HideTimer_Tick;
+    }
+
+    public void SetEdge(DockEdge edge)
+    {
+        if (Edge == edge) return;
+        Edge = edge;
+        // Park the surface at its new resting position; hidden docks slide off the matching screen edge.
+        _dockTranslate.BeginAnimation(TranslateTransform.YProperty, null);
+        _dockTranslate.Y = IsHidden ? HideOffset : 0;
+    }
+
+    private double HideOffset
+    {
+        get
+        {
+            var distance = Math.Max(72, _dockSurface.ActualHeight + 16);
+            return Edge == DockEdge.Top ? -distance : distance;
+        }
     }
 
     public void SetMode(AutoHideMode mode)
@@ -160,10 +179,9 @@ public sealed class DockAutoHideController : IDisposable
     public void AnimateHide()
     {
         IsHidden = true;
-        double hideOffset = Math.Max(72, _dockSurface.ActualHeight + 16);
         var anim = new DoubleAnimation
         {
-            To = hideOffset,
+            To = HideOffset,
             Duration = TimeSpan.FromMilliseconds(200),
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn }
         };
@@ -190,12 +208,25 @@ public sealed class DockAutoHideController : IDisposable
         if (dockMonitor != windowMonitor)
             return false;
 
-        if (IsZoomed(hwnd))
-            return true;
+        if (DwmGetWindowAttribute(hwnd, 14, out int cloaked, sizeof(int)) == 0 && cloaked != 0)
+            return false;
 
-        if (GetWindowRect(hwnd, out var winRect) && GetWindowRect(_windowHandle, out var dockRect))
+        if (DwmGetWindowAttribute(hwnd, 9, out Rect winRect, Marshal.SizeOf<Rect>()) != 0
+            && !GetWindowRect(hwnd, out winRect))
+            return false;
+
+        if (GetWindowRect(_windowHandle, out var dockRect))
         {
-            int effectiveDockTop = dockRect.Top + 16;
+            if (Edge == DockEdge.Top)
+            {
+                int effectiveDockBottom = dockRect.Bottom - 28;
+                return winRect.Left < dockRect.Right
+                    && winRect.Right > dockRect.Left
+                    && winRect.Top < effectiveDockBottom
+                    && winRect.Bottom > dockRect.Top;
+            }
+
+            int effectiveDockTop = dockRect.Top + 28;
             return winRect.Left < dockRect.Right
                 && winRect.Right > dockRect.Left
                 && winRect.Bottom > effectiveDockTop
@@ -247,4 +278,10 @@ public sealed class DockAutoHideController : IDisposable
 
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     private static extern int GetClassName(nint hWnd, StringBuilder lpClassName, int nMaxCount);
+
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmGetWindowAttribute(nint windowHandle, int attribute, out int value, int size);
+
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmGetWindowAttribute(nint windowHandle, int attribute, out Rect value, int size);
 }

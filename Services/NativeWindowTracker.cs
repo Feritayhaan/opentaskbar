@@ -27,6 +27,7 @@ public sealed class NativeWindowTracker : IDisposable
     private const uint WmClose = 0x0010;
     private const int ShowRestore = 9;
     private const int ShowMinimize = 6;
+    private const int DwmwaCloaked = 14;
     private const uint ProcessQueryLimitedInformation = 0x1000;
     private static readonly string WindowsSystemAppsDirectory = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.Windows), "SystemApps") + Path.DirectorySeparatorChar;
@@ -203,6 +204,11 @@ public sealed class NativeWindowTracker : IDisposable
 
         var extendedStyle = GetWindowLongPtr(windowHandle, GwlExStyle).ToInt64();
         if ((extendedStyle & WsExToolWindow) != 0 && (extendedStyle & WsExAppWindow) == 0)
+        {
+            return true;
+        }
+
+        if (IsWindowCloaked(windowHandle))
         {
             return true;
         }
@@ -480,6 +486,15 @@ public sealed class NativeWindowTracker : IDisposable
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool ShowWindow(nint windowHandle, int command);
+
+    private static bool IsWindowCloaked(nint windowHandle)
+    {
+        return DwmGetWindowAttribute(windowHandle, DwmwaCloaked, out var cloaked, sizeof(int)) == 0
+            && cloaked != 0;
+    }
+
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmGetWindowAttribute(nint windowHandle, int attribute, out int value, int size);
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]

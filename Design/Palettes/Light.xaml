@@ -38,4 +38,10 @@
     <SolidColorBrush x:Key="MenuDivider" Color="#20000000" />
     <SolidColorBrush x:Key="SettingsSidebarOverlay" Color="#24FFFFFF" />
     <SolidColorBrush x:Key="CaptionCloseForeground" Color="#FFFFFFFF" />
+    <SolidColorBrush x:Key="WidgetCardSurface" Color="#CCFFFFFF" />
+    <SolidColorBrush x:Key="WidgetCardBorder" Color="#1A000000" />
+    <SolidColorBrush x:Key="PositiveBrush" Color="#FF14804A" />
+    <SolidColorBrush x:Key="PositiveSurface" Color="#1F14804A" />
+    <SolidColorBrush x:Key="NegativeBrush" Color="#FFC6283B" />
+    <SolidColorBrush x:Key="NegativeSurface" Color="#1FC6283B" />
 </ResourceDictionary>
